@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { getApiUrl } from "@/config/api";
 
 interface Job {
   _id: string;
@@ -42,7 +43,7 @@ export default function ViewJob({ jobId }: { jobId: string }) {
     const fetchJob = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/jobs/${jobId}`);
+        const response = await fetch(getApiUrl(`/jobs/${jobId}`));
         const data = await response.json();
         console.log(data);
         if (response.ok) {
@@ -150,7 +151,7 @@ export default function ViewJob({ jobId }: { jobId: string }) {
       }
       formDataToSend.append("jobId", jobId);
 
-      const response = await fetch(`http://localhost:5000/api/applications`, {
+      const response = await fetch(getApiUrl("/applications"), {
         method: "POST",
         body: formDataToSend,
       });

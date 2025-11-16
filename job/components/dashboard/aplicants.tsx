@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { getApiUrl, API_BASE_URL } from "@/config/api";
 
 interface Application {
   _id: string;
@@ -27,7 +28,7 @@ export default function Applicants() {
     const fetchApplications = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:5000/api/applications");
+        const response = await fetch(getApiUrl("/applications"));
         const data = await response.json();
         console.log("Applications fetched:", data);
 
@@ -61,7 +62,9 @@ export default function Applicants() {
   };
 
   const handleDownloadResume = (resumePath: string) => {
-    const resumeUrl = `http://localhost:5000${resumePath}`;
+    // Remove /api from base URL for static file serving
+    const baseUrl = API_BASE_URL.replace('/api', '');
+    const resumeUrl = `${baseUrl}${resumePath}`;
     window.open(resumeUrl, "_blank");
   };
 

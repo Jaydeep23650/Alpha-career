@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const connectionString = process.env.MONGODB_URI || "mongodb+srv://jaydeepjnvmzp2002_db_user:hESNwTIRBwzYlQag@cluster0.0by1msm.mongodb.net/job_portal?retryWrites=true&w=majority&appName=Cluster0";
-
+// const connectionString =  "mongodb://localhost:27017/job_portal";
 const dbConnection = async () => {
     try {
         // Check if already connected

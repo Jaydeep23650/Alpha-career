@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { getApiUrl } from "@/config/api";
 
 interface Job {
   _id: string;
@@ -23,7 +24,7 @@ export default function Jobs() {
     const fetchJobs = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:5000/api/jobs");
+        const response = await fetch(getApiUrl("/jobs"));
         const data = await response.json();
         console.log(data);
         if (response.ok) {
@@ -208,7 +209,7 @@ export default function Jobs() {
                       onClick={() => router.push(`/jobs/${job._id}`)}
                       className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
                     >
-                      View Details
+                    Apply Now
                     </button>
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { getApiUrl } from "@/config/api";
 
 export default function CreatedJob() {
   const [formData, setFormData] = useState({
@@ -28,7 +29,7 @@ export default function CreatedJob() {
     console.log("Form submitted:", formData);
 
     try {
-      const response = await fetch("http://localhost:5000/api/jobs", {
+      const response = await fetch(getApiUrl("/jobs"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

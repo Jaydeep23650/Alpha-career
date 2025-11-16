@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 
     // import Header from "./header";
 export default function Home() {
+  const router = useRouter();
   useEffect(() => {
     console.log("Home");
   }, []);
@@ -12,7 +13,7 @@ export default function Home() {
   }
 
 
-  const router = useRouter();
+ 
   return (
     
    
@@ -31,7 +32,7 @@ export default function Home() {
           </p>
          
           <div className="flex items-center justify-center gap-4">
-            <button className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+            <button className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2" onClick={() => router.push("/jobs")}>
               Explore 1 Job
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -146,7 +147,7 @@ export default function Home() {
         <p className="text-xl text-white mb-8">
           Browse our job listings and start your application today.
         </p>
-        <button className="px-8 py-4 bg-white text-blue-600 font-medium rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto">
+        <button className="px-8 py-4 bg-white text-blue-600 font-medium rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto" onClick={() => router.push("/jobs")}>
           View All Jobs
          
         </button>

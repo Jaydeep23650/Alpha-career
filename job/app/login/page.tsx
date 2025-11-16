@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { getApiUrl } from '@/config/api';
 
 export default function Login() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function Login() {
     
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/admin/login', {
+      const response = await fetch(getApiUrl('/admin/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
