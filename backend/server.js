@@ -53,10 +53,31 @@ app.use(cors());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-dbConnection();
+// Helper function to check MongoDB connection
+const checkConnection = () => {
+    if (mongoose.connection.readyState !== 1) {
+        throw new Error("Database connection not established");
+    }
+};
+
+// Initialize server after database connection
+const startServer = async () => {
+    try {
+        await dbConnection();
+        
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("Failed to start server:", error.message);
+        process.exit(1);
+    }
+};
 
 app.post("/api/jobs", async (req, res) => {
     try {
+        checkConnection();
+        
         const { title, description, location, department } = req.body;
         
         if (!title || !description || !location || !department) {
@@ -73,7 +94,8 @@ app.post("/api/jobs", async (req, res) => {
         res.status(201).json({ message: "Job created successfully", job: newJob });
     } catch (error) {
         console.error("Error creating job:", error);
-        res.status(500).json({ 
+        const statusCode = error.message.includes("connection") ? 503 : 500;
+        res.status(statusCode).json({ 
             message: "Failed to create job",
             error: error.message 
         });
@@ -82,16 +104,23 @@ app.post("/api/jobs", async (req, res) => {
 
 app.get("/api/jobs", async (req, res) => {
     try {
+        checkConnection();
         const jobs = await Job.find();
         res.status(200).json({ jobs });
     } catch (error) {
         console.error("Error fetching jobs:", error);
-        res.status(500).json({ message: "Failed to fetch jobs", error: error.message });
+        const statusCode = error.message.includes("connection") ? 503 : 500;
+        res.status(statusCode).json({ 
+            message: "Failed to fetch jobs", 
+            error: error.message 
+        });
     }
 });
 
 app.get("/api/jobs/:id", async (req, res) => {
     try {
+        checkConnection();
+        
         const { id } = req.params;
         
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -107,7 +136,11 @@ app.get("/api/jobs/:id", async (req, res) => {
         res.status(200).json({ job });
     } catch (error) {
         console.error("Error fetching job:", error);
-        res.status(500).json({ message: "Failed to fetch job", error: error.message });
+        const statusCode = error.message.includes("connection") ? 503 : 500;
+        res.status(statusCode).json({ 
+            message: "Failed to fetch job", 
+            error: error.message 
+        });
     }
 });
 
@@ -126,6 +159,8 @@ app.post("/api/applications", (req, res, next) => {
     });
 }, async (req, res) => {
     try {
+        checkConnection();
+        
         const { fullName, email, phoneNumber, coverLetter, jobId } = req.body;
 
         // Validation
@@ -149,14 +184,26 @@ app.post("/api/applications", (req, res, next) => {
 
         // Validate job exists
         if (!mongoose.Types.ObjectId.isValid(jobId)) {
+            // Delete uploaded file if invalid job ID
+            if (req.file && req.file.path) {
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch (unlinkError) {
+                    console.error("Error deleting file:", unlinkError);
+                }
+            }
             return res.status(400).json({ message: "Invalid job ID" });
         }
 
         const job = await Job.findById(jobId);
         if (!job) {
             // Delete uploaded file if job doesn't exist
-            if (req.file) {
-                fs.unlinkSync(req.file.path);
+            if (req.file && req.file.path) {
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch (unlinkError) {
+                    console.error("Error deleting file:", unlinkError);
+                }
             }
             return res.status(404).json({ message: "Job not found" });
         }
@@ -194,7 +241,8 @@ app.post("/api/applications", (req, res, next) => {
             }
         }
 
-        res.status(500).json({
+        const statusCode = error.message.includes("connection") ? 503 : 500;
+        res.status(statusCode).json({
             message: "Failed to submit application",
             error: error.message,
         });
@@ -203,6 +251,8 @@ app.post("/api/applications", (req, res, next) => {
 
 app.get("/api/applications", async (req, res) => {
     try {
+        checkConnection();
+        
         const applications = await Application.find()
             .populate("jobId", "title department location")
             .sort({ createdAt: -1 }); 
@@ -210,7 +260,11 @@ app.get("/api/applications", async (req, res) => {
         res.status(200).json({ applications });
     } catch (error) {
         console.error("Error fetching applications:", error);
-        res.status(500).json({ message: "Failed to fetch applications", error: error.message });
+        const statusCode = error.message.includes("connection") ? 503 : 500;
+        res.status(statusCode).json({ 
+            message: "Failed to fetch applications", 
+            error: error.message 
+        });
     }
 });
 
@@ -228,6 +282,5 @@ app.post("/api/admin/login", async (req, res) => {
     }
 });
 
-app.listen(PORT,()=>{
-    console.log("Server is running on port 5000");
-})
+// Start the server
+startServer();
