@@ -15,6 +15,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Ensure uploads directory exists
+const PORT=process.env.PORT || 5000;
 const uploadsDir = path.join(__dirname, "uploads", "resumes");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
@@ -227,6 +228,6 @@ app.post("/api/admin/login", async (req, res) => {
     }
 });
 
-app.listen(5000,()=>{
+app.listen(PORT,()=>{
     console.log("Server is running on port 5000");
 })
